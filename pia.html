@@ -559,9 +559,9 @@ function updateProgressBar() {
 // ============================================================
 // NAVIGATION
 // ============================================================
-function navigateTo(stepIndex) {
+function navigateTo(stepIndex, skipCollect) {
   if (stepIndex < 0 || stepIndex >= 20) return;
-  collectCurrentStepData();
+  if (!skipCollect) collectCurrentStepData();
   saveState();
   document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(`step-${stepIndex}`);
@@ -1202,7 +1202,7 @@ function importJSON(event) {
       if (!confirm('This will replace all current data. Continue?')) return;
       state = parsed.state;
       saveState();
-      navigateTo(state.currentStep || 0);
+      navigateTo(state.currentStep || 0, true);
       alert('Data imported successfully.');
     } catch (err) {
       alert('Failed to import: ' + err.message);
