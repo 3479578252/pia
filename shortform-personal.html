@@ -4,13 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Short Privacy Assessment (Personal Information) — Australian Privacy Principles</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-tailwind.config = {
-  theme: { extend: { colors: { primary: '#059669', 'primary-light': '#10b981' } } }
-}
-</script>
+<link rel="stylesheet" href="tailwind.css">
+<style>:root { --primary: #059669; --primary-light: #10b981; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 <style>
   .wizard-step { display: none; }
   .wizard-step.active { display: block; }
@@ -304,7 +300,7 @@ function debounceSave() {
 // ============================================================
 function escapeHtml(str) {
   if (str == null) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
 function setNestedValue(obj, path, value) {
@@ -1329,11 +1325,24 @@ function resetForm() {
 // ============================================================
 // INIT
 // ============================================================
+function deepMerge(target, source) {
+  if (source === null || typeof source !== 'object' || Array.isArray(source)) return source;
+  for (const k of Object.keys(source)) {
+    const sv = source[k];
+    if (sv !== null && typeof sv === 'object' && !Array.isArray(sv) && target[k] !== null && typeof target[k] === 'object' && !Array.isArray(target[k])) {
+      deepMerge(target[k], sv);
+    } else {
+      target[k] = sv;
+    }
+  }
+  return target;
+}
+
 function initApp() {
   const saved = loadState();
   if (saved) {
     state = getDefaultState();
-    Object.assign(state, saved);
+    deepMerge(state, saved);
     if (!state.risks.items) state.risks.items = getDefaultRiskItems();
     RISK_ITEMS.forEach(r => { if (!state.risks.items[r.key]) state.risks.items[r.key] = { checked: false, mitigation: '' }; });
     if (!state.risks.items.other) state.risks.items.other = { checked: false, description: '', mitigation: '' };

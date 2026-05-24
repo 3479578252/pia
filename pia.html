@@ -4,24 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Impact Assessment — Health Records Act 2001 (Vic)</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: '#1e40af',
-        'primary-light': '#3b82f6',
-        secondary: '#0f766e',
-        danger: '#dc2626',
-        warning: '#f59e0b',
-        success: '#16a34a',
-      }
-    }
-  }
-}
-</script>
+<link rel="stylesheet" href="tailwind.css">
+<style>:root { --primary: #1e40af; --primary-light: #3b82f6; --secondary: #0f766e; --danger: #dc2626; --warning: #f59e0b; --success: #16a34a; }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 <style>
   .wizard-step { display: none; }
   .wizard-step.active { display: block; }
@@ -1211,7 +1196,9 @@ function importJSON(event) {
   reader.onload = function(e) {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (!parsed.state) throw new Error('Invalid file format');
+      if (!parsed || typeof parsed.state !== 'object' || parsed.state === null || Array.isArray(parsed.state) || Object.getPrototypeOf(parsed.state) !== Object.prototype) {
+        throw new Error('Invalid file format');
+      }
       if (!confirm('This will replace all current data. Continue?')) return;
       state = parsed.state;
       saveState();
